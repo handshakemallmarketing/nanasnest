@@ -1,0 +1,25 @@
+http://:{$PORT:8080} {
+    root * /srv
+    encode gzip zstd
+    header {
+        X-Content-Type-Options nosniff
+        X-Frame-Options DENY
+        Referrer-Policy strict-origin-when-cross-origin
+        Permissions-Policy "camera=(), microphone=(), geolocation=()"
+        Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
+    }
+    @preview not host nanasnestcare.com www.nanasnestcare.com
+    header @preview X-Robots-Tag "noindex, nofollow"
+    respond /healthz "ok" 200
+    @www host www.nanasnestcare.com
+    redir @www https://nanasnestcare.com{uri} 301
+    redir /services-offered /services/ 301
+    redir /parent-testimonials /testimonials.html 301
+    redir /contact /contact.html 301
+    reverse_proxy /api/inquiry 127.0.0.1:8090
+    file_server
+    handle_errors {
+        rewrite * /404.html
+        file_server
+    }
+}

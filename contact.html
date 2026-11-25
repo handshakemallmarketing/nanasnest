@@ -70,41 +70,19 @@
     </section><section>
     <div class="container">
       <div class="grid grid-2" style="align-items:flex-start;gap:48px;">
-        <form class="inquiry-form" action="https://formspree.io/f/YOUR_FORM_ID" method="POST" data-netlify="true" name="inquiry">
-          <p class="form-status small" style="display:none;color:#a4453a;"></p>
-          <div class="form-row">
-            <div class="field"><label for="name">Full Name</label><input id="name" name="name" type="text" required></div>
-            <div class="field"><label for="phone">Phone</label><input id="phone" name="phone" type="tel" required></div>
-          </div>
-          <div class="form-row">
-            <div class="field"><label for="email">Email</label><input id="email" name="email" type="email" required></div>
-            <div class="field"><label for="location">City / Neighborhood</label><input id="location" name="location" type="text" placeholder="e.g. Bethesda, MD"></div>
-          </div>
-          <div class="form-row">
-            <div class="field"><label for="dueDate">Due Date or Baby's Birthdate</label><input id="dueDate" name="due_date" type="text" placeholder="MM/DD/YYYY"></div>
-            <div class="field">
-              <label for="service">Service Interested In</label>
-              <select id="service" name="service">
-                <option>Newborn Night Nursing</option>
-                <option>Sleep Training &amp; Coaching</option>
-                <option>Both / Not Sure Yet</option>
-              </select>
-            </div>
-          </div>
-          <div class="field"><label for="referral">Who Referred You? (optional)</label><input id="referral" name="referred_by" type="text" placeholder="Friend, doula, pediatrician, past family..."></div>
-          <div class="field"><label for="message">Tell Us About Your Family</label><textarea id="message" name="message" rows="4" placeholder="Due date, household, what you're looking for..."></textarea></div>
-          <div class="field field-checkbox">
-            <input id="consent" name="consent" type="checkbox" required>
-            <label for="consent" style="font-weight:400;">I understand Nana's Nest will contact me about my inquiry, and my information will be kept confidential per the <a href="/privacy.html">privacy policy</a>.</label>
-          </div>
-          <button class="btn btn-primary btn-block" type="submit">Send Private Inquiry</button>
-          <p class="small" style="margin-top:14px;">Prefer email or phone? Reach us directly below.</p>
-        </form>
+        <div class="card"><h2>Check Caregiver Availability</h2><p>Request availability. Please do not include medical information.</p>
+<form id="care-inquiry" method="post" action="/api/inquiry" hidden>
+<p><label>Name <input name="name" required maxlength="80" autocomplete="name"></label></p>
+<p><label>Email <input name="email" type="email" required maxlength="254" autocomplete="email"></label></p>
+<p><label>Service <select name="service"><option>Overnight newborn care</option><option>Sleep coaching</option><option>General inquiry</option></select></label></p>
+<div hidden><label>Leave blank <input name="website" tabindex="-1" autocomplete="off"></label></div>
+<p><button class="btn btn-primary" type="submit">Request availability</button></p>
+<p role="status" id="inquiry-status"></p></form><p><a class="btn btn-primary btn-block" href="tel:+14436000583">Call (443) 600-0583</a></p><p><a class="btn btn-primary btn-block" href="mailto:nanasnestcare@gmail.com?subject=Care%20availability%20inquiry">Email Nana's Nest</a></p></div>
         <div>
           <h2>Direct Contact</h2>
           <div class="contact-methods">
-            <div class="contact-method"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6.6 10.8a15 15 0 0 0 6.6 6.6l2.2-2.2a1.4 1.4 0 0 1 1.5-.3c1.2.4 2.5.6 3.8.6.8 0 1.3.6 1.3 1.3V21c0 .7-.6 1.3-1.3 1.3C10.6 22.3 1.7 13.4 1.7 2.3 1.7 1.6 2.3 1 3 1h4.2c.7 0 1.3.6 1.3 1.3 0 1.3.2 2.6.6 3.8.2.5.1 1.1-.3 1.5L6.6 10.8Z" stroke-linejoin="round"/></svg></div><div><strong>(443) 600-0583</strong><p class="small mb-0">Call or text, Monday&ndash;Friday, 9am&ndash;6pm ET</p></div></div>
-            <div class="contact-method"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2.5" y="4.5" width="19" height="15" rx="2.4"/><path d="M3.5 6l8.5 6.5L20.5 6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><strong>nanasnestcare@gmail.com</strong><p class="small mb-0">We reply within 1&ndash;2 business days</p></div></div>
+            <div class="contact-method"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6.6 10.8a15 15 0 0 0 6.6 6.6l2.2-2.2a1.4 1.4 0 0 1 1.5-.3c1.2.4 2.5.6 3.8.6.8 0 1.3.6 1.3 1.3V21c0 .7-.6 1.3-1.3 1.3C10.6 22.3 1.7 13.4 1.7 2.3 1.7 1.6 2.3 1 3 1h4.2c.7 0 1.3.6 1.3 1.3 0 1.3.2 2.6.6 3.8.2.5.1 1.1-.3 1.5L6.6 10.8Z" stroke-linejoin="round"/></svg></div><div><strong><a href="tel:+14436000583">(443) 600-0583</a></strong><p class="small mb-0">Call or text, Monday&ndash;Friday, 9am&ndash;6pm ET</p></div></div>
+            <div class="contact-method"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2.5" y="4.5" width="19" height="15" rx="2.4"/><path d="M3.5 6l8.5 6.5L20.5 6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><strong><a href="mailto:nanasnestcare@gmail.com">nanasnestcare@gmail.com</a></strong><p class="small mb-0">We reply within 1&ndash;2 business days</p></div></div>
             <div class="contact-method"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s7-6.6 7-12.4A7 7 0 0 0 5 9.6C5 15.4 12 22 12 22Z" stroke-linejoin="round"/><circle cx="12" cy="9.6" r="2.4"/></svg></div><div><strong>Washington, DC · Maryland · Northern Virginia</strong><p class="small mb-0">In-home visits; virtual sleep consults available anywhere</p></div></div>
             <div class="contact-method"><div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><strong>Overnight Shifts</strong><p class="small mb-0">Typically 9pm&ndash;6am or 10pm&ndash;6am, customized to your household</p></div></div>
           </div>
@@ -164,5 +142,6 @@
     </div>
   </footer>
   <script src="/assets/js/main.js"></script>
+<script src="/assets/js/inquiry.js"></script>
 </body>
 </html>

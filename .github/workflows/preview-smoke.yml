@@ -1,0 +1,36 @@
+name: Railway public acceptance
+on:
+  push:
+    branches: ['migration/railway-readiness']
+  workflow_dispatch:
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          python3 - <<'PY'
+          import urllib.request as u
+          import xml.etree.ElementTree as E
+          from urllib.parse import urlparse
+          base='https://nanasnest-preview-production.up.railway.app'
+          paths=['/healthz','/robots.txt','/sitemap.xml','/assets/css/style.css','/assets/js/main.js']
+          paths += [urlparse(x.text).path for x in E.parse('sitemap.xml').findall('.//{*}loc')]
+          for path in paths:
+              with u.urlopen(base+path,timeout=20) as r:
+                  assert r.status==200,path
+                  assert 'noindex' in r.headers.get('X-Robots-Tag',''),path
+                  assert r.headers.get('X-Content-Type-Options')=='nosniff',path
+                  print(path,r.status)
+          class NoRedirect(u.HTTPRedirectHandler):
+              def redirect_request(self,*args,**kwargs): return None
+          opener=u.build_opener(NoRedirect)
+          for path,target in [('/services-offered','/services/'),('/parent-testimonials','/testimonials.html'),('/contact','/contact.html'),('/nonexistent-acceptance-test',None)]:
+              try:
+                  opener.open(base+path,timeout=20)
+                  raise AssertionError(path)
+              except u.HTTPError as e:
+                  assert e.code==(301 if target else 404),(path,e.code)
+                  if target: assert e.headers['Location']==target,(path,e.headers['Location'])
+                  print(path,e.code)
+          PY
