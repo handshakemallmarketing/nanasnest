@@ -17,6 +17,7 @@ http://:{$PORT:8080} {
     redir /parent-testimonials /testimonials.html 301
     redir /contact /contact.html 301
     reverse_proxy /api/inquiry 127.0.0.1:8090
+    reverse_proxy /api/event 127.0.0.1:8090
     file_server
     handle_errors {
         rewrite * /404.html
