@@ -1,0 +1,18 @@
+name: SEO and hosting validation
+on: [push, pull_request]
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 tests/seo_check.py
+      - run: docker build -t nanasnest-test .
+      - run: docker run --rm nanasnest-test caddy validate --config /etc/caddy/Caddyfile
+      - run: |
+          docker run -d --name site -p 8080:8080 nanasnest-test
+          for i in $(seq 1 20); do curl -fsS http://localhost:8080/healthz && break; sleep 1; done
+          curl -fsS http://localhost:8080/healthz
+          curl -fsS http://localhost:8080/sitemap.xml
+          curl -fsSI http://localhost:8080/ | grep -i 'x-robots-tag: noindex'
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/services-offered)" = 301
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/nonexistent)" = 404
