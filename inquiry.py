@@ -1,12 +1,10 @@
-import os, json, re, time, base64, threading
+import os, json, re, time, threading
 from collections import deque
-from email.message import EmailMessage
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.request import Request, urlopen
-from urllib.parse import urlencode
 
 MAIL = "nanasnestcare@gmail.com"
-KEYS = ("GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET", "GOOGLE_REFRESH_TOKEN")
+KEYS = ("RESEND_API_KEY",)
 ORIGINS = {"https://nanasnestcare.com", "https://nanasnest-preview-production.up.railway.app"}
 lock = threading.Lock()
 attempts = deque()
@@ -44,26 +42,17 @@ def post(url, data, headers):
         return json.load(response)
 
 def send(to, subject, body, token, reply=None):
-    msg=EmailMessage()
-    msg["From"]=MAIL
-    msg["To"]=to
-    msg["Subject"]=subject
-    if reply: msg["Reply-To"]=reply
-    msg.set_content(body)
-    raw=base64.urlsafe_b64encode(msg.as_bytes()).decode()
-    return post("https://gmail.googleapis.com/gmail/v1/users/me/messages/send",
-                json.dumps({"raw":raw}).encode(),
-                {"Authorization":"Bearer "+token,"Content-Type":"application/json"})
+    payload={"from":"Nana's Nest Care <inquiries@mail.nanasnestcare.com>","to":[to],"subject":subject,"text":body}
+    if reply: payload["reply_to"]=reply
+    return post("https://api.resend.com/emails",json.dumps(payload).encode(),
+                {"Authorization":"Bearer "+token,"Content-Type":"application/json","User-Agent":"NanasNest/1.0"})
 
 def deliver(name,address,service):
-    token=post("https://oauth2.googleapis.com/token",urlencode({
-        "client_id":os.environ[KEYS[0]],"client_secret":os.environ[KEYS[1]],
-        "refresh_token":os.environ[KEYS[2]],"grant_type":"refresh_token"
-    }).encode(),{"Content-Type":"application/x-www-form-urlencoded"})["access_token"]
+    token=os.environ["RESEND_API_KEY"]
     send(MAIL,"New website inquiry",f"Name: {name}\nEmail: {address}\nService: {service}",token,address)
     try:
         send(address,"Nana's Nest received your inquiry",
-             "Thank you for contacting Nana's Nest. We will follow up personally. If you did not submit this inquiry, please disregard this message.",token)
+             "Thank you for contacting Nana's Nest. We will follow up personally. If you did not submit this inquiry, please disregard this message.",token,MAIL)
     except Exception:
         print("Acknowledgment delivery failed",flush=True)
         return False
