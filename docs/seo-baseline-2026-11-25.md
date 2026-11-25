@@ -7,3 +7,6 @@ Search Console: no rows returned for aggregate, query or page performance. Missi
 Business Profile: desktop search 14, mobile search 13, desktop maps 7, mobile maps 13; total 47 impressions. Website clicks 0; call clicks 0. Voice of Merchant true. Review API returned count 0 and null average; public review count not independently verified.
 
 Weekly measurement: impressions, clicks, weighted CTR, query/page performance, profile impressions and interactions, qualified inquiries and paid engagements. Do not infer unique visitors from profile impressions or equate call clicks with completed calls. Compare equal complete reporting windows. Preserve missing-data status.
+
+## Sitemap submission update
+2026-11-25: Owner supplied screenshot of successful Search Console sitemap submission following canonical sitemap instructions. Processing and indexation remain unverified.
