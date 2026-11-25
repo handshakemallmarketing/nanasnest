@@ -18,7 +18,7 @@ class Page(HTMLParser):
     def handle_endtag(self,tag):
         if tag=="script" and self.schema: json.loads(self.buf); self.schema=False
 urls=ET.parse(root/"sitemap.xml").findall(".//{*}loc")
-assert len(urls)>=18
+assert len(urls)>=28
 seen=set()
 for loc in urls:
     url=loc.text
