@@ -1,0 +1,30 @@
+name: Inquiry validation
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          python3 - <<'PY'
+          import inquiry as i
+          from unittest.mock import patch
+          good=dict(name='Test',email='test@example.com',service='Sleep coaching')
+          assert i.validate(good)==('Test','test@example.com','Sleep coaching')
+          for bad in [dict(good,website='bot'),dict(good,email='bad'),dict(good,name='x\ny'),dict(good,service='wrong')]:
+              try: i.validate(bad)
+              except ValueError: continue
+              raise AssertionError('invalid accepted')
+          assert i.reserve('test@example.com')
+          assert not i.reserve('test@example.com')
+          with patch.dict(i.os.environ,dict(zip(i.KEYS,['dummy']*3))),patch.object(i,'post',return_value={'access_token':'fake'}),patch.object(i,'send') as send:
+              assert i.deliver('Test','test@example.com','Sleep coaching')
+              assert send.call_count==2
+              assert send.call_args_list[0].args[0]==i.MAIL
+          PY
+      - run: |
+          docker build -t inquiry-test .
+          docker run -d --name inquiry-test -p 8080:8080 inquiry-test
+          curl --retry 10 --retry-connrefused -fsS http://localhost:8080/healthz
+          test "$(curl -s -o /dev/null -w '%{http_code}' -H 'Origin: https://nanasnestcare.com' -H 'Content-Type: application/json' -d '{"name":"Test","email":"test@example.com","service":"Sleep coaching"}' http://localhost:8080/api/inquiry)" = 503
+          test "$(curl -s -o /dev/null -w '%{http_code}' -H 'Content-Type: application/json' -d '{}' http://localhost:8080/api/inquiry)" = 403
