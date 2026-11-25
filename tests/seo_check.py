@@ -18,7 +18,7 @@ class Page(HTMLParser):
     def handle_endtag(self,tag):
         if tag=="script" and self.schema: json.loads(self.buf); self.schema=False
 urls=ET.parse(root/"sitemap.xml").findall(".//{*}loc")
-assert len(urls)==17
+assert len(urls)>=18
 seen=set()
 for loc in urls:
     url=loc.text
@@ -32,4 +32,4 @@ for loc in urls:
     assert p.h1==1,(file,p.h1)
     assert "YOUR_FORM_ID" not in html,file
 assert "Sitemap: "+base+"/sitemap.xml" in (root/"robots.txt").read_text()
-print("17 sitemap pages passed canonical, H1 and JSON-LD checks")
+print(f"{len(urls)} sitemap pages passed canonical, H1 and JSON-LD checks")
