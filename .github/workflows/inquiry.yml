@@ -17,7 +17,7 @@ jobs:
               raise AssertionError('invalid accepted')
           assert i.reserve('test@example.com')
           assert not i.reserve('test@example.com')
-          with patch.dict(i.os.environ,dict(zip(i.KEYS,['dummy']*3))),patch.object(i,'post',return_value={'access_token':'fake'}),patch.object(i,'send') as send:
+          with patch.dict(i.os.environ,{'RESEND_API_KEY':'dummy'}),patch.object(i,'send') as send:
               assert i.deliver('Test','test@example.com','Sleep coaching')
               assert send.call_count==2
               assert send.call_args_list[0].args[0]==i.MAIL
