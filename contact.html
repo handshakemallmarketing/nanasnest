@@ -70,7 +70,14 @@
     </section><section>
     <div class="container">
       <div class="grid grid-2" style="align-items:flex-start;gap:48px;">
-        <div class="card"><h2>Check Caregiver Availability</h2><p>Contact us directly to discuss overnight newborn care or sleep coaching. Please avoid sending sensitive medical information by email.</p><p><a class="btn btn-primary btn-block" href="tel:+14436000583">Call (443) 600-0583</a></p><p><a class="btn btn-primary btn-block" href="mailto:nanasnestcare@gmail.com?subject=Care%20availability%20inquiry">Email Nana's Nest</a></p></div>
+        <div class="card"><h2>Check Caregiver Availability</h2><p>Request availability. Please do not include medical information.</p>
+<form id="care-inquiry" method="post" action="/api/inquiry" hidden>
+<p><label>Name <input name="name" required maxlength="80" autocomplete="name"></label></p>
+<p><label>Email <input name="email" type="email" required maxlength="254" autocomplete="email"></label></p>
+<p><label>Service <select name="service"><option>Overnight newborn care</option><option>Sleep coaching</option><option>General inquiry</option></select></label></p>
+<div hidden><label>Leave blank <input name="website" tabindex="-1" autocomplete="off"></label></div>
+<p><button class="btn btn-primary" type="submit">Request availability</button></p>
+<p role="status" id="inquiry-status"></p></form><p><a class="btn btn-primary btn-block" href="tel:+14436000583">Call (443) 600-0583</a></p><p><a class="btn btn-primary btn-block" href="mailto:nanasnestcare@gmail.com?subject=Care%20availability%20inquiry">Email Nana's Nest</a></p></div>
         <div>
           <h2>Direct Contact</h2>
           <div class="contact-methods">
@@ -135,5 +142,6 @@
     </div>
   </footer>
   <script src="/assets/js/main.js"></script>
+<script src="/assets/js/inquiry.js"></script>
 </body>
 </html>
