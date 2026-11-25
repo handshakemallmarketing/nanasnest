@@ -59,7 +59,7 @@ def deliver(name,address,service):
     return True
 
 EVENTS = {"service_page_view","availability_click","phone_click","email_click","google_profile_click","google_review_click"}
-PAGES = {"/referrals.html","/","/services/","/services/newborn-night-nursing.html","/services/sleep-training.html","/about.html","/contact.html","/testimonials.html","/faq.html","/areas/maryland.html","/areas/washington-dc.html","/areas/northern-virginia.html","/blog/"}
+PAGES = {"/blog/choose-overnight-newborn-caregiver.html","/blog/questions-before-hiring-night-nanny.html","/blog/how-many-nights-newborn-care.html","/blog/planning-newborn-care-before-due-date.html","/blog/overnight-newborn-care-twins.html","/blog/what-happens-overnight-newborn-care.html","/blog/in-home-vs-virtual-sleep-consultation.html","/blog/newborn-support-before-returning-to-work.html","/blog/choosing-best-crib-new-baby.html","/blog/older-siblings-adjusting-new-baby.html","/referrals.html","/","/services/","/services/newborn-night-nursing.html","/services/sleep-training.html","/about.html","/contact.html","/testimonials.html","/faq.html","/areas/maryland.html","/areas/washington-dc.html","/areas/northern-virginia.html","/blog/"}
 def metric(event, page):
     print(json.dumps({"metric":event,"page":page},separators=(",",":")),flush=True)
 
