@@ -58,6 +58,11 @@ def deliver(name,address,service):
         return False
     return True
 
+EVENTS = {"service_page_view","availability_click","phone_click","email_click","google_profile_click","google_review_click"}
+PAGES = {"/","/services/","/services/newborn-night-nursing.html","/services/sleep-training.html","/about.html","/contact.html","/testimonials.html","/faq.html","/areas/maryland.html","/areas/washington-dc.html","/areas/northern-virginia.html","/blog/"}
+def metric(event, page):
+    print(json.dumps({"metric":event,"page":page},separators=(",",":")),flush=True)
+
 class Handler(BaseHTTPRequestHandler):
     def log_message(self,*args): pass
     def reply(self,status,message):
@@ -69,6 +74,19 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
     def do_POST(self):
+        if self.path=="/api/event":
+            if self.headers.get("Origin") not in ORIGINS: return self.reply(403,"Forbidden")
+            try:
+                if self.headers.get("Content-Type","").split(";")[0]!="application/json": raise ValueError()
+                length=int(self.headers.get("Content-Length","0"))
+                if not 0<length<=512: raise ValueError()
+                data=json.loads(self.rfile.read(length))
+                if not isinstance(data,dict) or set(data)!={"event","page"}: raise ValueError()
+                if not all(isinstance(v,str) for v in data.values()): raise ValueError()
+                if data["event"] not in EVENTS or data["page"] not in PAGES: raise ValueError()
+            except (ValueError,UnicodeError): return self.reply(400,"Invalid event")
+            if self.headers.get("Origin")=="https://nanasnestcare.com": metric(data["event"],data["page"])
+            return self.reply(200,"OK")
         if self.path!="/api/inquiry": return self.reply(404,"Not found")
         if self.headers.get("Origin") not in ORIGINS: return self.reply(403,"Forbidden")
         if self.headers.get("Content-Type","").split(";")[0]!="application/json": return self.reply(415,"Unsupported format")
@@ -85,6 +103,7 @@ class Handler(BaseHTTPRequestHandler):
         except Exception:
             print("Inquiry delivery failed",flush=True)
             return self.reply(503,"Unable to confirm delivery. Please contact us directly.")
+        if self.headers.get("Origin")=="https://nanasnestcare.com": metric("inquiry_submitted","/contact.html")
         return self.reply(200,"Inquiry received. Thank you." if ack else "Inquiry received. A confirmation email may not arrive.")
 
 if __name__=="__main__":
