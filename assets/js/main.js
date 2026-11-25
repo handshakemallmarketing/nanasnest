@@ -10,6 +10,13 @@
     });
   }
 
+  document.addEventListener("keydown", function(e) {
+    if(e.key === "Escape" && body.classList.contains("nav-open")) {
+      body.classList.remove("nav-open");
+      if(toggle) { toggle.setAttribute("aria-expanded","false"); toggle.focus(); }
+    }
+  });
+  window.matchMedia("(max-width: 1100px)").addEventListener("change",function(e){if(!e.matches){body.classList.remove("nav-open");if(toggle)toggle.setAttribute("aria-expanded","false");}});
   // Close mobile nav when a link is chosen
   document.querySelectorAll(".main-nav a").forEach(function (link) {
     link.addEventListener("click", function () {
