@@ -59,7 +59,7 @@ def deliver(name,address,service):
     return True
 
 EVENTS = {"service_page_view","availability_click","phone_click","email_click","google_profile_click","google_review_click"}
-PAGES = {"/","/services/","/services/newborn-night-nursing.html","/services/sleep-training.html","/about.html","/contact.html","/testimonials.html","/faq.html","/areas/maryland.html","/areas/washington-dc.html","/areas/northern-virginia.html","/blog/"}
+PAGES = {"/referrals.html","/","/services/","/services/newborn-night-nursing.html","/services/sleep-training.html","/about.html","/contact.html","/testimonials.html","/faq.html","/areas/maryland.html","/areas/washington-dc.html","/areas/northern-virginia.html","/blog/"}
 def metric(event, page):
     print(json.dumps({"metric":event,"page":page},separators=(",",":")),flush=True)
 
