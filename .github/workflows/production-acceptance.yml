@@ -1,15 +1,33 @@
 name: Production acceptance
 on:
   push:
-    branches: [seo/production-certification]
+    branches: [main]
   workflow_dispatch:
+concurrency:
+  group: production-acceptance
+  cancel-in-progress: true
 permissions:
   contents: read
 jobs:
   public:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+      - name: Wait for intended production release
+        env:
+          EXPECTED_SHA: ${{ github.sha }}
+        run: |
+          for attempt in $(seq 1 60); do
+            actual=$(curl --silent --show-error --fail --max-time 10 -H 'Cache-Control: no-cache' "https://nanasnestcare.com/release.txt?sha=$EXPECTED_SHA" || true)
+            if [ "$actual" = "$EXPECTED_SHA" ]; then
+              echo "Verified production release $EXPECTED_SHA"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "::error::Production did not serve expected commit $EXPECTED_SHA"
+          exit 1
       - name: Verify public production
         run: |
           python3 - <<'PY'
