@@ -1,7 +1,6 @@
 name: Production acceptance
 on:
-  push:
-    branches: [main]
+  deployment_status:
   workflow_dispatch:
 concurrency:
   group: production-acceptance
@@ -10,13 +9,16 @@ permissions:
   contents: read
 jobs:
   public:
+    if: github.event_name == 'workflow_dispatch' || (github.event.deployment_status.state == 'success' && github.event.deployment.ref == 'main')
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.deployment.sha || github.sha }}
       - name: Wait for intended production release
         env:
-          EXPECTED_SHA: ${{ github.sha }}
+          EXPECTED_SHA: ${{ github.event.deployment.sha || github.sha }}
         run: |
           for attempt in $(seq 1 60); do
             actual=$(curl --silent --show-error --fail --max-time 10 -H 'Cache-Control: no-cache' "https://nanasnestcare.com/release.txt?sha=$EXPECTED_SHA" || true)
