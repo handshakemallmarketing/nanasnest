@@ -1,0 +1,51 @@
+name: Production acceptance
+on:
+  push:
+    branches: [seo/production-certification]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  public:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify public production
+        run: |
+          python3 - <<'PY'
+          import urllib.request as u, urllib.error, xml.etree.ElementTree as ET
+          from html.parser import HTMLParser
+          base = 'https://nanasnestcare.com'
+          ns = {'s':'http://www.sitemaps.org/schemas/sitemap/0.9'}
+          def urls(data):
+              return [x.text for x in ET.fromstring(data).findall('s:url/s:loc',ns)]
+          def get(url):
+              return u.urlopen(u.Request(url,headers={'User-Agent':'NanasNestAcceptance/1.0'}),timeout=20)
+          class Page(HTMLParser):
+              canonical = None
+              noindex = False
+              def handle_starttag(self,tag,attrs):
+                  a=dict(attrs)
+                  if tag=='link' and a.get('rel')=='canonical': self.canonical=a.get('href')
+                  if tag=='meta' and a.get('name','').lower() in ('robots','googlebot') and 'noindex' in a.get('content','').lower(): self.noindex=True
+          with get(base+'/sitemap.xml') as r:
+              live=urls(r.read())
+          expected=urls(open('sitemap.xml','rb').read())
+          assert len(live)==len(set(live)) and set(live)==set(expected), (len(live),len(expected))
+          for url in live:
+              with get(url) as r:
+                  assert r.status==200 and r.url==url, url
+                  assert 'noindex' not in r.headers.get('X-Robots-Tag','').lower(), url
+                  p=Page(); p.feed(r.read().decode())
+                  assert p.canonical==url and not p.noindex, (url,p.canonical,p.noindex)
+                  print('PASS',url,flush=True)
+          with get('https://www.nanasnestcare.com/about.html?test=1') as r:
+              assert r.url==base+'/about.html?test=1',r.url
+          with get(base+'/healthz') as r: assert r.status==200
+          with get(base+'/robots.txt') as r:
+              assert base+'/sitemap.xml' in r.read().decode()
+          try: get(base+'/nonexistent-acceptance-check-20261125')
+          except urllib.error.HTTPError as e: assert e.code==404,e.code
+          else: raise AssertionError('Expected 404')
+          print('PASS public sitemap, canonical URLs, robots, health, www redirect and 404')
+          PY
