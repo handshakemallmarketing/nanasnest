@@ -2,6 +2,7 @@ FROM caddy:2-alpine
 RUN apk add --no-cache python3
 COPY inquiry.py /opt/inquiry.py
 COPY Caddyfile /etc/caddy/Caddyfile
+# llms.txt is copied into the image so it is served at /llms.txt
 COPY *.html robots.txt sitemap.xml llms.txt /srv/
 COPY assets /srv/assets
 COPY areas /srv/areas
